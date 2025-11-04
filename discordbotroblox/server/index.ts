@@ -84,7 +84,7 @@ app.post("/submit", async (req: Request, res: Response) => {
     console.log("🧾 Message reçu du site :", message);
 
     // 🔹 Remplace cet ID par l’ID du salon ou du fil de discussion Discord
-    const channelId = "123456789012345678"; // <--- à modifier !
+    const channelId = "1433929615897923737"; // <--- à modifier !
     const channel = await client.channels.fetch(channelId);
 
     if (channel?.isTextBased()) {
