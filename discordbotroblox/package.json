@@ -1,11 +1,10 @@
 {
-  "name": "repl",
+  "name": "discordbotroblox",
   "type": "module",
   "scripts": {
     "dev": "tsx watch server/index.ts",
-    "build": "vite build",
-    "start": "NODE_ENV=production tsx server/index.ts",
-    "db:push": "drizzle-kit push"
+    "build": "cd client && npm install && npm run build && cd .. && npm install",
+    "start": "NODE_ENV=production tsx server/index.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
