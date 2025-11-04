@@ -1,21 +1,24 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { setupVite, log } from "./vite"; // ❌ on retire serveStatic
+import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
 
-declare module "http" {
+// ✅ Page d'accueil
+app.get("/", (req, res) => {
+  res.send("<h1>✅ Bot Discord Roblox est en ligne !</h1>");
+});
+
+declare module 'http' {
   interface IncomingMessage {
-    rawBody: unknown;
+    rawBody: unknown
   }
 }
-
 app.use(express.json({
   verify: (req, _res, buf) => {
     req.rawBody = buf;
   }
 }));
-
 app.use(express.urlencoded({ extended: false }));
 
 app.use((req, res, next) => {
@@ -51,33 +54,26 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
-  // Gestion des erreurs globales
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
-
     res.status(status).json({ message });
-    console.error("Unhandled error:", err);
+    throw err;
   });
 
-  // ✅ Pour éviter l’erreur “Could not find the build directory”
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
-    console.log("Skipping static serving (no client build)");
+    serveStatic(app);
   }
 
-  // Démarrage du serveur
-  const port = parseInt(process.env.PORT || "5000", 10);
-  server.listen(
-    {
-      port,
-      host: "0.0.0.0",
-      reusePort: true,
-    },
-    () => {
-      log(`✅ Server running on port ${port}`);
-    }
-  );
+  const port = parseInt(process.env.PORT || '5000', 10);
+  server.listen({
+    port,
+    host: "0.0.0.0",
+    reusePort: true,
+  }, () => {
+    log(`✅ Server running on port ${port}`);
+  });
 })();
 
