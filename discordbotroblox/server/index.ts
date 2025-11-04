@@ -1,25 +1,28 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { setupVite } from "./vite";
-
+import { setupVite } from "./vite"; // ✅ simplifié, plus de serveStatic ni log
 
 const app = express();
 
-// ✅ Page d'accueil
+// ✅ Page d'accueil personnalisée
 app.get("/", (req, res) => {
-  res.send("<h1>✅ Bot Discord Roblox est en ligne !</h1>");
+  res.send("<h1>✅ Bot Discord Roblox est en ligne avec ta page custom !</h1>");
 });
 
-declare module 'http' {
+declare module "http" {
   interface IncomingMessage {
-    rawBody: unknown
+    rawBody: unknown;
   }
 }
-app.use(express.json({
-  verify: (req, _res, buf) => {
-    req.rawBody = buf;
-  }
-}));
+
+app.use(
+  express.json({
+    verify: (req, _res, buf) => {
+      req.rawBody = buf;
+    },
+  })
+);
+
 app.use(express.urlencoded({ extended: false }));
 
 app.use((req, res, next) => {
@@ -45,7 +48,7 @@ app.use((req, res, next) => {
         logLine = logLine.slice(0, 79) + "…";
       }
 
-      log(logLine);
+      console.log(logLine);
     }
   });
 
@@ -62,19 +65,19 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
-  }
+  // ✅ En prod, on sert ton site statique buildé par Vite
+  await setupVite(app);
 
-  const port = parseInt(process.env.PORT || '5000', 10);
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`✅ Server running on port ${port}`);
-  });
+  const port = parseInt(process.env.PORT || "5000", 10);
+  server.listen(
+    {
+      port,
+      host: "0.0.0.0",
+      reusePort: true,
+    },
+    () => {
+      console.log(`✅ Server running on port ${port}`);
+    }
+  );
 })();
 
