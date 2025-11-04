@@ -1,3 +1,14 @@
+import express from "express";
+const app = express();
+
+app.get("/", (req, res) => {
+  res.send("Bot is running ✅");
+});
+
+app.listen(process.env.PORT || 3000, () => {
+  console.log("✅ Web server running on port " + (process.env.PORT || 3000));
+});
+
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
