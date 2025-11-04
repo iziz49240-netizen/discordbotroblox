@@ -1,24 +1,20 @@
 import express from "express";
-import { setupVite, serveStatic } from "./vite"; // ✅ On a supprimé 'log'
+import path from "path";
+import { fileURLToPath } from "url";
 
-// Petit logger local optionnel
-const log = (...args: any[]) => console.log("[Server]", ...args);
+export async function setupVite(app: any) {
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-export async function createServer() {
-  const app = express();
-
-  // En production → on sert les fichiers du dossier build
   if (process.env.NODE_ENV === "production") {
-    log("🚀 Mode production activé - serving static files");
-    serveStatic(app);
+    // 👉 Sert les fichiers du dossier client/dist (build frontend)
+    const distPath = path.join(__dirname, "../client/dist");
+    app.use(express.static(distPath));
+
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(distPath, "index.html"));
+    });
   } else {
-    log("💻 Mode développement activé - setup Vite");
-    await setupVite(app);
+    // 👉 Mode développement : simple message
+    console.log("✅ Vite setup skipped in development mode");
   }
-
-  const port = process.env.PORT || 10000;
-  app.listen(port, () => {
-    log(`✅ Serveur lancé sur le port ${port}`);
-  });
 }
-
