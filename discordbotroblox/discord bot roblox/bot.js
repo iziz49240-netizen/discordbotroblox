@@ -321,7 +321,7 @@ if (process.env.TOKEN) {
                 .setLabel("Clique ici pour commencer")
                 .setURL(
                     process.env.REPLIT_URL ||
-                        "https://529ea008-6abb-4ff0-9baa-3a633d8139d1-00-3rtjyrf89sum9.spock.replit.dev/",
+                        "https://discordbotroblox-ewms.onrender.com",
                 )
                 .setStyle(ButtonStyle.Link),
         );
