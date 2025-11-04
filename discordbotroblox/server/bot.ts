@@ -88,3 +88,4 @@ app.listen(port, () => {
 // ✅ Connexion du bot
 client.login(process.env.DISCORD_TOKEN);
 
+
