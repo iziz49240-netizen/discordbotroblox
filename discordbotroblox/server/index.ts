@@ -26,5 +26,60 @@ app.use((req, res, next) => {
 
   res.on("finish", () => {
     if (pathReq.startsWith("/api")) {
-      const duration = Date
+      const duration = Date.now() - start;
+      console.log(`${req.method} ${pathReq} ${res.statusCode} - ${duration}ms`);
+    }
+  });
+
+  next();
+});
+
+(async () => {
+  const server = await registerRoutes(app);
+
+  // ✅ Ajout de la route POST /submit pour corriger "Cannot POST /submit"
+  app.post("/submit", async (req: Request, res: Response) => {
+    try {
+      const { message } = req.body;
+
+      if (!message) {
+        return res.status(400).json({ error: "Message manquant" });
+      }
+
+      console.log("🧾 Message reçu depuis le site :", message);
+
+      // Si tu veux l’envoyer à ton bot Discord, tu peux ajouter ici :
+      // await client.channels.cache.get("ID_DU_CHANNEL").send(message);
+
+      return res.json({ success: true, message: "Message bien reçu !" });
+    } catch (err) {
+      console.error("❌ Erreur /submit :", err);
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  // ✅ Sert ta page Vite buildée (client/dist)
+  const clientDistPath = path.join(__dirname, "../client/dist");
+  app.use(express.static(clientDistPath));
+
+  // ✅ Toutes les routes (/, /about, etc.) redirigent vers index.html
+  app.get("*", (_req, res) => {
+    res.sendFile(path.join(clientDistPath, "index.html"));
+  });
+
+  // Gestion des erreurs
+  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+    const status = err.status || 500;
+    const message = err.message || "Internal Server Error";
+    res.status(status).json({ message });
+    console.error("❌ Server Error:", err);
+  });
+
+  // ✅ Port compatible Render
+  const port = parseInt(process.env.PORT || "10000", 10);
+  server.listen({ port, host: "0.0.0.0", reusePort: true }, () => {
+    console.log(`✅ Server running on port ${port}`);
+  });
+})();
+
 
