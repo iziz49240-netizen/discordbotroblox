@@ -66,5 +66,3 @@ app.listen(PORT, () => {
   console.log(`✅ Serveur web en ligne sur le port ${PORT}`);
 });
 
-
-
