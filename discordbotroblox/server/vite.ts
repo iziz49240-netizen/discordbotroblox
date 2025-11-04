@@ -1,88 +1,87 @@
-import express, { type Express } from "express";
-import fs from "fs";
+import express, { type Request, Response, NextFunction } from "express";
 import path from "path";
-import { createServer as createViteServer, createLogger } from "vite";
-import { type Server } from "http";
-import viteConfig from "../vite.config";
-import { nanoid } from "nanoid";
+import { registerRoutes } from "./routes";
+import { setupVite, serveStatic, log } from "./vite";
 
-const viteLogger = createLogger();
+const app = express();
+const __dirname = path.resolve();
 
-export function log(message: string, source = "express") {
-  const formattedTime = new Date().toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  });
+// ✅ Sert les fichiers statiques depuis /server/public
+app.use(express.static(path.join(__dirname, "server/public")));
 
-  console.log(`${formattedTime} [${source}] ${message}`);
+// ✅ Page d’accueil custom
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "server/public", "index.html"));
+});
+
+// 🔒 Gestion du raw body pour certaines API
+declare module 'http' {
+  interface IncomingMessage {
+    rawBody: unknown;
+  }
 }
+app.use(express.json({
+  verify: (req, _res, buf) => {
+    req.rawBody = buf;
+  }
+}));
+app.use(express.urlencoded({ extended: false }));
 
-export async function setupVite(app: Express, server: Server) {
-  const serverOptions = {
-    middlewareMode: true,
-    hmr: { server },
-    allowedHosts: true as const,
+// 🧾 Middleware de logs pour les routes /api
+app.use((req, res, next) => {
+  const start = Date.now();
+  const pathUrl = req.path;
+  let capturedJsonResponse: Record<string, any> | undefined = undefined;
+
+  const originalResJson = res.json;
+  res.json = function (bodyJson, ...args) {
+    capturedJsonResponse = bodyJson;
+    return originalResJson.apply(res, [bodyJson, ...args]);
   };
 
-  const vite = await createViteServer({
-    ...viteConfig,
-    configFile: false,
-    customLogger: {
-      ...viteLogger,
-      error: (msg, options) => {
-        viteLogger.error(msg, options);
-        process.exit(1);
-      },
-    },
-    server: serverOptions,
-    appType: "custom",
-  });
-
-  app.use(vite.middlewares);
-  app.use("*", async (req, res, next) => {
-    const url = req.originalUrl;
-
-    try {
-      const clientTemplate = path.resolve(
-        import.meta.dirname,
-        "..",
-        "client",
-        "index.html"
-      );
-
-      // always reload the index.html file from disk in case it changes
-      let template = await fs.promises.readFile(clientTemplate, "utf-8");
-      template = template.replace(
-        `src="/src/main.tsx"`,
-        `src="/src/main.tsx?v=${nanoid()}"`
-      );
-      const page = await vite.transformIndexHtml(url, template);
-      res.status(200).set({ "Content-Type": "text/html" }).end(page);
-    } catch (e) {
-      vite.ssrFixStacktrace(e as Error);
-      next(e);
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    if (pathUrl.startsWith("/api")) {
+      let logLine = `${req.method} ${pathUrl} ${res.statusCode} in ${duration}ms`;
+      if (capturedJsonResponse) {
+        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+      }
+      if (logLine.length > 80) logLine = logLine.slice(0, 79) + "…";
+      log(logLine);
     }
   });
-}
 
-// ✅ Correction : on sert maintenant les fichiers depuis client/dist
-export function serveStatic(app: Express) {
-  const distPath = path.resolve(import.meta.dirname, "../client/dist");
+  next();
+});
 
-  if (!fs.existsSync(distPath)) {
-    throw new Error(
-      `❌ Impossible de trouver le dossier build du client : ${distPath}. 
-Assure-toi d'avoir exécuté "npm run build" dans le dossier client avant de déployer.`
-    );
+// 🚀 Lancement du serveur
+(async () => {
+  const server = await registerRoutes(app);
+
+  // 🔥 Gestion des erreurs
+  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+    const status = err.status || err.statusCode || 500;
+    const message = err.message || "Internal Server Error";
+    res.status(status).json({ message });
+    throw err;
+  });
+
+  // ⚙️ Mode développement vs production
+  if (app.get("env") === "development") {
+    await setupVite(app, server);
+  } else {
+    serveStatic(app);
   }
 
-  app.use(express.static(distPath));
-
-  // Fallback pour les routes de type SPA
-  app.use("*", (_req, res) => {
-    res.sendFile(path.resolve(distPath, "index.html"));
-  });
-}
-
+  const port = parseInt(process.env.PORT || '5000', 10);
+  server.listen(
+    {
+      port,
+      host: "0.0.0.0",
+      reusePort: true,
+    },
+    () => {
+      log(`✅ Server running on port ${port}`);
+    }
+  );
+})();
