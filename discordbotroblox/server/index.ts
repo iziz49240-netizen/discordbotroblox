@@ -9,17 +9,13 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
-
-// 🧩 Middleware essentiel pour lire le JSON du body :
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // ✅ AJOUT IMPORTANT
+app.use(cors());
 
-// 🔧 Configuration
 const PORT = process.env.PORT || 10000;
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 const WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
 
-// 📁 Correction pour __dirname dans ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -40,16 +36,14 @@ client
 // ---- Servir le build React ---- //
 app.use(express.static(path.join(__dirname, "../client/dist")));
 
-// ---- Route d'accueil ---- //
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../client/dist/index.html"));
 });
 
 // ---- Route POST /submit ---- //
 app.post("/submit", async (req, res) => {
-  console.log("🧾 Corps reçu :", req.body); // 👈 pour debug
-
   const { message } = req.body;
+  console.log("🧾 Message reçu du site :", message);
 
   if (!message) {
     return res.status(400).json({ error: "Message manquant" });
@@ -58,11 +52,12 @@ app.post("/submit", async (req, res) => {
   try {
     if (!WEBHOOK_URL) throw new Error("Webhook non défini");
 
+    // ✉️ Envoi direct du message (sans texte supplémentaire)
     await fetch(WEBHOOK_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        content: `📩 **Nouveau message reçu depuis le site web :**\n${message}`,
+        content: message, // 👉 envoie juste le message
       }),
     });
 
@@ -74,7 +69,7 @@ app.post("/submit", async (req, res) => {
   }
 });
 
-// ---- Démarrage du serveur ---- //
 app.listen(PORT, () => {
   console.log(`✅ Serveur web en ligne sur le port ${PORT}`);
 });
+
