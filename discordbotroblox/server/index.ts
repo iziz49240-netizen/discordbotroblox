@@ -12,12 +12,12 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// 🔧 Configuration de base
+// 🔧 Configuration
 const PORT = process.env.PORT || 10000;
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 const WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
 
-// 📁 Correction pour __dirname dans les modules ES
+// 📁 Correction pour __dirname dans ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -35,15 +35,15 @@ client
   .then(() => console.log("✅ Bot Discord connecté"))
   .catch((err) => console.error("❌ Erreur de connexion du bot :", err));
 
-// ---- Servir le site React buildé ---- //
+// ---- Servir le build React ---- //
 app.use(express.static(path.join(__dirname, "../client/dist")));
 
-// ---- Route d'accueil (serve le index.html du build) ---- //
+// ---- Route d'accueil ---- //
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../client/dist/index.html"));
 });
 
-// ---- Route /submit pour les messages ---- //
+// ---- Route POST /submit ---- //
 app.post("/submit", async (req, res) => {
   const { message } = req.body;
   console.log("🧾 Message reçu du site :", message);
@@ -71,8 +71,7 @@ app.post("/submit", async (req, res) => {
   }
 });
 
-// ---- Lancement du serveur ---- //
+// ---- Démarrage du serveur ---- //
 app.listen(PORT, () => {
   console.log(`✅ Serveur web en ligne sur le port ${PORT}`);
 });
-
