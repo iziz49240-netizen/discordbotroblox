@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import fetch from "node-fetch";
+import path from "path";
+import { fileURLToPath } from "url";
 import { Client, GatewayIntentBits } from "discord.js";
 import dotenv from "dotenv";
 
@@ -10,9 +12,14 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// 🔧 Configuration de base
 const PORT = process.env.PORT || 10000;
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 const WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
+
+// 📁 Correction pour __dirname dans les modules ES
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // ---- Initialisation du bot Discord ---- //
 const client = new Client({
@@ -28,12 +35,15 @@ client
   .then(() => console.log("✅ Bot Discord connecté"))
   .catch((err) => console.error("❌ Erreur de connexion du bot :", err));
 
-// ---- Route de test ---- //
+// ---- Servir le site React buildé ---- //
+app.use(express.static(path.join(__dirname, "../client/dist")));
+
+// ---- Route d'accueil (serve le index.html du build) ---- //
 app.get("/", (req, res) => {
-  res.send("🚀 Serveur du bot en ligne !");
+  res.sendFile(path.join(__dirname, "../client/dist/index.html"));
 });
 
-// ---- Route pour le site web ---- //
+// ---- Route /submit pour les messages ---- //
 app.post("/submit", async (req, res) => {
   const { message } = req.body;
   console.log("🧾 Message reçu du site :", message);
