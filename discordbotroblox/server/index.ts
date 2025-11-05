@@ -9,8 +9,10 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
+
+// 🧩 Middleware essentiel pour lire le JSON du body :
 app.use(express.json());
-app.use(cors());
+app.use(express.urlencoded({ extended: true })); // ✅ AJOUT IMPORTANT
 
 // 🔧 Configuration
 const PORT = process.env.PORT || 10000;
@@ -45,8 +47,9 @@ app.get("/", (req, res) => {
 
 // ---- Route POST /submit ---- //
 app.post("/submit", async (req, res) => {
+  console.log("🧾 Corps reçu :", req.body); // 👈 pour debug
+
   const { message } = req.body;
-  console.log("🧾 Message reçu du site :", message);
 
   if (!message) {
     return res.status(400).json({ error: "Message manquant" });
