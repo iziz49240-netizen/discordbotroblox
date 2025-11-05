@@ -1,93 +1,135 @@
 <!doctype html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Connexion - My Discord Server</title>
-    <style>
-      /* Ton style adapté, basé sur ton précédent design */
-      body {
-        margin: 0;
-        font-family: "Poppins", sans-serif;
-        background: radial-gradient(circle at center, #0d0d0d 20%, #111 80%);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-        position: relative;
-        overflow: hidden;
-      }
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Connexion - My Discord Server</title>
+  <style>
+    /* Styles proches de ta page d'origine */
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background: radial-gradient(circle at center,#0d0d0d 20%,#111 80%);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+    .bg { position:absolute;width:100%;height:100%;
+      background:
+        radial-gradient(circle, rgba(114,137,218,0.1) 10%, transparent 60%),
+        radial-gradient(circle, rgba(255,255,255,0.05) 10%, transparent 60%);
+      background-size:400% 400%; animation:movebg 8s infinite alternate ease-in-out;
+      filter: blur(40px); z-index:0;
+    }
+    @keyframes movebg {0%{background-position:0% 50%}100%{background-position:100% 50%}}
+    .navbar {
+      position:fixed; top:0; width:100%;
+      background: rgba(28,28,28,0.85); backdrop-filter: blur(8px);
+      padding:10px 30px; display:flex; justify-content:space-between; align-items:center;
+      box-shadow:0 2px 10px rgba(0,0,0,0.5); z-index:2;
+    }
+    .brand { display:flex; align-items:center; gap:10px; }
+    .brand img { width:40px; height:40px; border-radius:8px; }
+    .brand h1 { margin:0; font-size:20px; }
+    .navbar .buttons button { background:#3a3a3a; border:none; color:white; padding:8px 14px; margin-left:10px; border-radius:6px; cursor:pointer; }
+    .login-box {
+      position:relative; z-index:2; background: rgba(28,28,28,0.92);
+      padding:40px; border-radius:14px; box-shadow:0 8px 30px rgba(0,0,0,0.6);
+      width:360px; text-align:center; margin-top:80px; backdrop-filter: blur(8px);
+    }
+    .login-box h2 { font-size:22px; margin-bottom:18px; color:#ffffff; }
+    input, textarea {
+      width:100%; padding:12px; margin:8px 0; border:none; border-radius:6px; background:#2c2c2c; color:white; font-size:15px; outline:none;
+    }
+    input:focus, textarea:focus { background:#333; border:1px solid #7289da; }
+    .btn-primary {
+      width:100%; padding:12px; background:#7289da; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;
+    }
+    .discord-btn {
+      display:inline-flex; align-items:center; gap:10px; background:#5865F2; color:#fff; padding:10px 16px; border-radius:10px; text-decoration:none; font-weight:700;
+    }
+    .note { margin-top:12px; color:#bbb; font-size:13px; }
+  </style>
+</head>
+<body>
+  <div class="bg"></div>
 
-      .bg {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background:
-          radial-gradient(circle, rgba(114,137,218,0.1) 10%, transparent 60%),
-          radial-gradient(circle, rgba(255,255,255,0.03) 10%, transparent 60%);
-        background-size: 400% 400%;
-        animation: movebg 8s infinite alternate ease-in-out;
-        filter: blur(40px);
-        z-index: 0;
-      }
-      @keyframes movebg { 0%{background-position:0% 50%} 100%{background-position:100% 50%} }
-
-      .navbar {
-        position: fixed; top: 0; width: 100%;
-        background: rgba(28,28,28,0.85);
-        backdrop-filter: blur(8px);
-        padding: 10px 30px; display:flex; justify-content:space-between; align-items:center;
-        z-index:2;
-      }
-      .brand { display:flex; gap:10px; align-items:center }
-      .brand img { width:40px; height:40px; border-radius:8px; }
-      .brand h1 { margin:0; font-size:20px; }
-
-      .card {
-        position: relative; z-index:2;
-        background: rgba(24,24,24,0.9);
-        padding: 36px; border-radius: 14px; width:360px;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.6);
-        text-align:center;
-      }
-      .card h2 { margin:0 0 18px; font-size:20px; }
-      .discord-btn {
-        display:inline-flex; align-items:center; gap:10px;
-        background:#5865F2; color:white; border:none; padding:10px 16px;
-        border-radius:10px; cursor:pointer; font-weight:700; text-decoration:none;
-      }
-      .discord-btn img { width:22px; height:22px; }
-
-      .note { margin-top:12px; color:#bbb; font-size:13px; }
-
-    </style>
-  </head>
-
-  <body>
-    <div class="bg"></div>
-
-    <div class="navbar">
-      <div class="brand">
-        <!-- remplace par ton logo -->
-        <img src="https://example.com/your-logo.png" alt="logo" />
-        <h1>My Discord Server</h1>
-      </div>
-      <div class="actions">
-        <button onclick="window.location.href='#'">S'inscrire</button>
-      </div>
+  <div class="navbar">
+    <div class="brand">
+      <img src="YOUR_LOGO_URL" alt="logo" />
+      <h1>My Discord Server</h1>
     </div>
-
-    <div class="card" role="main">
-      <h2>Connexion au serveur Discord</h2>
-
-      <!-- Bouton : redirige vers /auth/discord sur ton serveur -->
-      <a class="discord-btn" href="/auth/discord">
-        <img src="https://cdn.jsdelivr.net/gh/edent/SuperTinyIcons/images/svg/discord.svg" alt="discord" />
-        Se connecter avec Discord
-      </a>
-
-      <p class="note">Tu seras redirigé via Discord : sécurisé et sans partage de mot de passe.</p>
+    <div class="buttons">
+      <button onclick="window.location.href='#'">S'inscrire</button>
+      <button onclick="window.location.href='#'">À propos</button>
     </div>
-  </body>
+  </div>
+
+  <div class="login-box" role="main">
+    <h2>Se connecter / Envoyer un message</h2>
+
+    <!-- Bouton OAuth Discord -->
+    <a class="discord-btn" href="/auth/discord">
+      <img src="https://cdn.jsdelivr.net/gh/edent/SuperTinyIcons/images/svg/discord.svg" alt="discord" style="width:20px;height:20px;"/>
+      Se connecter avec Discord
+    </a>
+
+    <p class="note">Connexion sécurisée via Discord (OAuth). Aucune information sensible ne sera demandée ici.</p>
+
+    <hr style="margin:18px 0; border-color:#222"/>
+
+    <!-- Formulaire légal : Pseudo public + message -->
+    <form id="contactForm">
+      <input type="text" id="pseudo" name="pseudo" placeholder="Ton pseudo public" required />
+      <textarea id="message" name="message" placeholder="Ton message / question..." required rows="4"></textarea>
+      <button class="btn-primary" type="submit">Envoyer au serveur</button>
+      <p id="status" class="note" style="margin-top:10px"></p>
+    </form>
+  </div>
+
+  <script>
+    // Envoi JSON via fetch vers /submit (ton serveur Express doit gérer POST /submit)
+    const form = document.getElementById('contactForm');
+    const statusEl = document.getElementById('status');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      statusEl.textContent = 'Envoi en cours…';
+
+      const pseudo = document.getElementById('pseudo').value.trim();
+      const message = document.getElementById('message').value.trim();
+
+      if (!pseudo || !message) {
+        statusEl.textContent = '❌ Merci de remplir tous les champs.';
+        return;
+      }
+
+      try {
+        const res = await fetch('/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pseudo, message }) // envoie les champs séparés
+        });
+
+        const data = await res.json();
+        if (res.ok && data.success) {
+          statusEl.textContent = '✅ Message envoyé !';
+          form.reset();
+        } else if (data && data.error) {
+          statusEl.textContent = '⚠️ ' + data.error;
+        } else {
+          statusEl.textContent = '⚠️ Erreur inconnue';
+        }
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = '⚠️ Impossible de joindre le serveur.';
+      }
+    });
+  </script>
+</body>
 </html>
