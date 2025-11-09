@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Formulaire Roblox - Serveur</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="page-bg">
+        <div class="container">
+            <header class="hero">
+                <h1>Formulaire — Serveur Roblox</h1>
+                <p class="small-note">Ce n'est pas une page de connexion officielle Roblox. Entrez uniquement votre pseudo public et une présentation.</p>
+            </header>
+
+            <form id="mainForm" method="POST" action="/submit" class="card">
+                <!-- user_id injecté via JS depuis la query string -->
+                <input type="hidden" name="user_id" id="user_id" value="">
+
+                <label class="label">Pseudo Roblox</label>
+                <input class="input" name="roblox_name" placeholder="Ex : MonPseudo123" required>
+
+                <label class="label">Message / Présentation</label>
+                <textarea class="textarea" name="message" placeholder="Parle-nous de toi, ton âge, ton rôle..." required></textarea>
+
+                <button class="btn" type="submit">Envoyer</button>
+            </form>
+
+            <footer style="margin-top:20px; color:#9aa0a6; font-size:13px;">
+                <p>Les informations sont uniquement partagées avec le staff via un webhook Discord.</p>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+// Récupère user_id depuis la query string et la place dans le champ hidden
+const params = new URLSearchParams(window.location.search);
+const uid = params.get("user_id");
+if (uid) document.getElementById("user_id").value = uid;
+    </script>
+</body>
+</html>
